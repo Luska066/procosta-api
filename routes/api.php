@@ -113,10 +113,22 @@ Route::get('/image/temp', function (Request $request) {
         $id = explode('_', basename($file_name))[1];
         $payload[] = [
             "id" => explode('.', basename($id))[0],
+            "filename" => $file_name,
             "path" => Storage::disk('public')->url($file)
         ];
     }
-   return $payload;
+   return  response($payload)
+        ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+        ->header('Pragma', 'no-cache')
+        ->header('Expires', '0');;
+});
+
+Route::get('/image/wind/{fileName}', function (Request $request,$fileName) {
+    $payload = [];
+    $type = $request->query('type') ?? 'w';
+    
+    $json = Storage::disk('public')->get($type."/$fileName");
+   return json_encode($json,false);
 });
 
 
